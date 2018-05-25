@@ -1,0 +1,25 @@
+{
+  "name": "cfn-resource",
+  "version": "0.0.1",
+  "description": "The safest implementation for CloudFormation custom resources in NodeJS.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/odedniv/cfn-custom.git"
+  },
+  "keywords": [
+    "aws",
+    "cloudformation",
+    "custom resource",
+    "lambda"
+  ],
+  "author": "Oded Niv",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/odedniv/cfn-custom/issues"
+  },
+  "homepage": "https://github.com/odedniv/cfn-custom#readme"
+}

@@ -1,5 +1,5 @@
 {
-  "name": "cfn-resource",
+  "name": "safe-cfn-custom-resource",
   "version": "0.0.1",
   "description": "The safest implementation for CloudFormation custom resources in NodeJS.",
   "main": "index.js",
@@ -23,7 +23,12 @@
   },
   "homepage": "https://github.com/odedniv/cfn-custom#readme",
   "devDependencies": {
+    "cfn-custom-resource": "^4.0.5",
     "eslint": "^4.19.1",
     "eslint-plugin-mocha": "^5.0.0"
+  },
+  "dependencies": {
+    "request": "^2.87.0",
+    "request-promise": "^4.2.2"
   }
 }

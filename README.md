@@ -17,10 +17,9 @@ npm install --save safe-cfn-custom-resource
 ## Requirements
 
 * **Lambda Runtime:** NodeJS 8.10+ (the handler will return a promise)
-* **Lambda Timeout:** 3+ seconds (the function will timeout 2 seconds before Lambda's timeout)
+* **Lambda Timeout:** 4+ seconds (the function will timeout 3 seconds before Lambda's timeout)
 
-**Note:** 3 seconds timeout means you have less than 1 second to finish your work,
-          you should probably set it to more.
+**Note:** 4 seconds timeout means you have less than 1 second to finish your work, you should probably set it to more.
 
 ## Usage
 
@@ -59,7 +58,9 @@ module.exports.handler = require('safe-cfn-custom-resource')(/*async*/ () => {
 });
 ```
 
-See the [official documentation for the custom resource's event structure](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-custom-resources.html).
+* See the [official documentation for custom resource request event structure](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/crpg-ref-requests.html).
+* If you throw an error with an `id` attribute, it will be used as the physical resource id send with the failure message to CloudFormation.
+* If you are using VPN, make sure you allow the function to connect to CloudFormation's endpoint.
 
 * **Tip 1:** Remember that if the update requires re-creation, return the new physical resource id and don't delete the old one,
              CloudFormation will automatically call this function again for deletion of the old physical resource id.

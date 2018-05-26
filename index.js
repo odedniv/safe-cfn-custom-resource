@@ -45,7 +45,7 @@ class Handler {
         this.handleResource(),
       ]);
     } catch (err) {
-      return await this.sendFailure({ reason: err });
+      return await this.sendFailure({ reason: err, id: err && err.id });
     }
   }
 
@@ -54,9 +54,10 @@ class Handler {
    */
   handleTimeout() {
     return new Promise((resolve, reject) => {
+      if (process.env.DEBUG) console.log(`Timing out in: ~${this.context.getRemainingTimeInMillis() - 3000}ms`);
       setTimeout(
-        () => reject("Function timed out (2 seconds prior to actual timeout)"),
-        this.context.getRemainingTimeInMillis() - 2000
+        () => reject("Function timed out (3 seconds prior to actual timeout)"),
+        this.context.getRemainingTimeInMillis() - 3000
       );
     });
   }
@@ -66,11 +67,16 @@ class Handler {
    */
   async handleResource() {
     let resource = await this.resource; // initializer to return a promise
-    switch (this.event.RequestType) {
-      case CREATE: return await sendSuccess(await resource.create(this.event, this.context));
-      case UPDATE: return await sendSuccess(await resource.update(this.event, this.context));
-      case DELETE: return await sendSuccess(await resource.delete(this.event, this.context));
-    }
+    let method = {
+      [CREATE]: resource.create,
+      [UPDATE]: resource.update,
+      [DELETE]: resource.delete,
+    }[this.event.RequestType];
+
+    if (!method) throw new Error(`Invalid RequestType received: ${this.event.RequestType}`);
+    return await this.sendSuccess(
+      await method(this.event, this.context) || {}
+    );
   }
 
   /*
@@ -79,7 +85,7 @@ class Handler {
   async sendSuccess({ id, data }) {
     if (this.responseSent) return;
     this.responseSent = true;
-    return await sendSuccess(id, data, this.event);
+    return await sendSuccess(id || this.event.PhysicalResourceId, data, this.event);
   }
 
   /*
@@ -116,7 +122,8 @@ function wrapper(initializer) {
   }
 
   return async (event, context) => {
-    return await Handler(event, context, resource, initErr).promise();
+    let handler = new Handler(event, context, resource, initErr);
+    return await handler.promise();
   };
 }
 

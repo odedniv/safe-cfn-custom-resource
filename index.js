@@ -55,36 +55,40 @@ class Handler {
   handleTimeout() {
     return new Promise((resolve, reject) => {
       setTimeout(
-        () => reject("Function timed out (3 seconds prior to actual timeout)"),
-        this.context.getRemainingTimeInMillis() - 3000
+        () => reject("Function timed out (2 seconds prior to actual timeout)"),
+        this.context.getRemainingTimeInMillis() - 2000
       );
     });
   }
 
+  /*
+   * Calls the resource's functions, depending on the event's RequestType.
+   */
   async handleResource() {
+    let resource = await this.resource; // initializer to return a promise
     switch (this.event.RequestType) {
-      case CREATE: return await sendSuccess(await this.resource.create(this.event));
-      case UPDATE: return await sendSuccess(await this.resource.update(this.event));
-      case DELETE: return await sendSuccess(await this.resource.delete(this.event));
+      case CREATE: return await sendSuccess(await resource.create(this.event, this.context));
+      case UPDATE: return await sendSuccess(await resource.update(this.event, this.context));
+      case DELETE: return await sendSuccess(await resource.delete(this.event, this.context));
     }
   }
 
   /*
    * Wrapper around cfn-custom-resource's sendSuccess, with the Handler's data.
    */
-  async sendSuccess({ physicalResourceId, data }) {
+  async sendSuccess({ id, data }) {
     if (this.responseSent) return;
     this.responseSent = true;
-    return await sendSuccess(physicalResourceId, data, this.event);
+    return await sendSuccess(id, data, this.event);
   }
 
   /*
    * Wrapper around cfn-custom-resource's sendFailure, with the Handler's data.
    */
-  async sendFailure({ reason, physicalResourceId }) {
+  async sendFailure({ reason, id }) {
     if (this.responseSent) return;
     this.responseSent = true;
-    await sendFailure(reason, this.event, this.context, physicalResourceId);
+    await sendFailure(reason, this.event, this.context, id);
     throw reason;
   }
 }
@@ -92,21 +96,21 @@ class Handler {
 /*
  * Wrapper that creates a safe handler for a CloudFormation custom resource lambda.
  *
- * @param {Function} initialize  All the user's code is to be done in this function.
- *                               The user's function needs to return an object in this format:
- *                                 {
- *                                   create: Function(event) => { physicalResourceId, data? },
- *                                   update: Function(event) => { physicalResourceId?, data? },
- *                                   delete: Function(event),
- *                                 }
- * @return {Function}            The handler to be used for the custom resource's lambda:
- *                                 Function(event, context) => Promise
+ * @param {Function} initializer  All the user's code is to be done in this function.
+ *                                The user's function needs to return an object in this format:
+ *                                  {
+ *                                    create: Function(event, context) => { id, data? },
+ *                                    update: Function(event, context) => { id?, data? },
+ *                                    delete: Function(event, context),
+ *                                  }
+ * @return {Function}             The handler to be used for the custom resource's lambda:
+ *                                  Function(event, context) => Promise
  */
-function wrapper(initialize) {
+function wrapper(initializer) {
   let resource;
   let initErr;
   try {
-    resource = initialize();
+    resource = initializer();
   } catch (err) {
     initErr = err || "Unknown error during initialization (before the handler was invoked)";
   }

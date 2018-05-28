@@ -5,7 +5,7 @@ Tired of having your CloudFormation stack for **1 whole hour** because of a bug 
 
 This package lets you have the safest implementation of your custom resource, if you use it properly your stack will never get stuck.
 
-Special thanks to [zippadd/cfn-custom-resource](https://github.com/zippadd/cfn-custom-resource),
+Special thanks to [zippadd/cfn-custom-resource](https://www.npmjs.com/package/cfn-custom-resource),
 this is basically a wrapper around it.
 
 ## Install
@@ -33,7 +33,7 @@ module.exports.handler = require('safe-cfn-custom-resource')(/*async*/ () => {
 
   // event & context are the original ones the handler was invoked with.
   return {
-    create: /*async*/ (event, context) => {
+    /*async*/ create(event, context) {
       return {
         // required
         id: "the physical resource id (Ref)",
@@ -42,7 +42,7 @@ module.exports.handler = require('safe-cfn-custom-resource')(/*async*/ () => {
         data: { Key: "value", For: "GetAtt" }
       };
     },
-    update: /*async*/ (event, context) => {
+    /*async*/ update(event, context) {
       return {
         // optional, original physical resource id will be used if not supplied
         id: "the physical resource id (Ref)",
@@ -51,7 +51,7 @@ module.exports.handler = require('safe-cfn-custom-resource')(/*async*/ () => {
         data: { Key: "value", For: "GetAtt" }
       };
     },
-    delete: /*async*/ (event, context) => {
+    /*async*/ delete(event, context) {
       // doesn't need to return anything
     },
   };

@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "description": "The safest implementation for CloudFormation custom resources in NodeJS.",
   "main": "index.js",
+  "files": [
+    "index.js",
+    "lib/"
+  ],
   "scripts": {
     "test": "nyc mocha --recursive test/setup.js test/unit && eslint lib/ test/"
   },

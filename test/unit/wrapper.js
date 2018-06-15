@@ -50,6 +50,11 @@ describe('wrapper', function() {
           // no data
         });
     });
+
+    it("expoese the resource", function() {
+      expect(this.handler.resource)
+        .to.equal(this.resource);
+    });
   });
 
   describe("when initialization fails", function() {

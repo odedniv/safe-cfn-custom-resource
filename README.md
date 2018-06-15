@@ -66,7 +66,66 @@ module.exports.handler = require('safe-cfn-custom-resource')(/*async*/ () => {
              CloudFormation will automatically call this function again for deletion of the old physical resource id.
 * **Tip 2:** Use [Webpack](https://webpack.js.org/) to save some artifact size when using dependencies (like this one).
 
-## Debugging
+### Debugging
 
 Setting an environment variable called `DEBUG` on your Lambda function will give you debug logging in CloudWatch.
 Note that your lambda needs to be able to access the function's CloudWatch log stream.
+
+### Unit testing your resource
+
+In order to unit test your implementation there are 3 options:
+
+1. You can write your logic in a separate `resource.js` file,
+   and `require` & `return` it in the `index.js` that is used as the Lambda's handler:
+
+   ```javascript
+   # resource.js
+   module.exports = {
+     /*async*/ create(event, context) {
+       /* see above */
+     }
+     /*async*/ update(event, context) {
+       /* see above */
+     }
+     /*async*/ delete(event, context) {
+       /* see above */
+     }
+   };
+
+   # index.js
+   module.exports.handler = require('safe-cfn-custom-resource')(/*async*/ () => {
+     // Require it INSIDE the safety callback!
+     return require('./resource');
+   });
+   ```
+
+   And now you can `require` your implementation separetely.
+
+2. If you are a minimalist there is a second option. `safe-cfn-custom-resource`
+   exposes whatever you return inside the callback via a `resource` attribute:
+
+   ```javascript
+   const { handler } = require('./index');
+   let event = { /* CloudFormation event */ };
+   let context = { /* Lambda context */ };
+   handler.create(event, context);
+   handler.update(event, context);
+   handler.delete(event, context);
+   ```
+
+   Feel free to return additional internal functions you want to test.
+
+3. You can avoid testing internal functions (e.g your `create`/`update`/`delete`),
+   and only test the exported handler:
+
+   ```javascript
+   const { handler } = require('./index');
+   let context = { /* Lambda context */ };
+   handler({ /* CloudFormation Create event */ }, context);
+   handler({ /* CloudFormation Update event */ }, context);
+   handler({ /* CloudFormation Delete event */ }, context);
+   ```
+
+## License
+
+MIT

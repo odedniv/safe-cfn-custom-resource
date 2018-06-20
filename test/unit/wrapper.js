@@ -105,5 +105,10 @@ describe('wrapper', function() {
     it("returns a failed promise", function() {
       expect(this.thrown).to.equal(this.error);
     });
+
+    it("exposes the error", function() {
+      expect(this.handler.initError)
+        .to.equal(this.error);
+    });
   });
 });

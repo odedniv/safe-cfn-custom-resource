@@ -1,6 +1,6 @@
 {
   "name": "safe-cfn-custom-resource",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The safest implementation for CloudFormation custom resources in NodeJS.",
   "main": "index.js",
   "files": [

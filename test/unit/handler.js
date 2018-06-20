@@ -29,7 +29,7 @@ describe('Handler', function() {
           update: () => {},
           delete: () => {},
         }),
-        // initErr
+        // initError
         undefined,
       );
     });
@@ -223,7 +223,7 @@ describe('Handler', function() {
           update: () => {},
           delete: () => {},
         }),
-        // initErr
+        // initError
         this.error,
       );
 

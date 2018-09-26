@@ -108,9 +108,9 @@ In order to unit test your implementation there are 3 options:
    const { handler } = require('./index');
    let event = { /* CloudFormation event */ };
    let context = { /* Lambda context */ };
-   handler.create(event, context);
-   handler.update(event, context);
-   handler.delete(event, context);
+   handler.resource.create(event, context);
+   handler.resource.update(event, context);
+   handler.resource.delete(event, context);
    ```
 
    Feel free to return additional internal functions you want to test.
